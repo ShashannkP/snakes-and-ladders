@@ -41,3 +41,9 @@ def validate_players(configs: list[PlayerConfig]) -> list[PlayerConfig]:
         colours.add(config.colour)
         normalized.append(PlayerConfig(name, config.colour))
     return normalized
+
+
+def validate_setup(configs: list[PlayerConfig]) -> list[PlayerConfig]:
+    if not 2 <= len(configs) <= 4:
+        raise InputValidationError("Configure 2 to 4 players before starting.")
+    return validate_players(configs)
