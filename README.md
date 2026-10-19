@@ -1,4 +1,22 @@
 # snake-game
+
+## Running the application
+
+Install Python 3.10+ and run from the repository root:
+
+```sh
+python -m pip install -e ".[dev]"
+python -m snakes_ladders.main
+```
+
+Choose 2–4 players, enter each name, and click token colours to cycle them.
+Names must be unique (ignoring case), contain 1–15 ASCII letters, digits or
+spaces, and cannot be blank. Colours must also be unique. Tab moves to the
+next name field. This branch provides the player setup screen; game starting
+is added by the Game Initialization issue.
+
+Run automated checks with `python -m pytest`.
+
 Team members: 
 1) Name: shishir hegde  SRN: PES1UG24CS438
 2) Name: Shaurya singh SRN: PES1UG24CS437
