@@ -27,9 +27,13 @@ class GameEngine:
         # Step 2: move forward by exactly the dice value (FR-04).
         from_pos = player.position
         target = from_pos + roll
-        # TODO FR-10: step 3, overshoot past 100.
-        # Step 4: snake or ladder at the landing square (FR-06, FR-07).
-        final, event = self._board.resolve(target)
+        if target > Board.SIZE:
+            # Step 3: overshoot; the token stays where it is and the turn passes (FR-10).
+            landed, final, event = from_pos, from_pos, Event.OVERSHOOT
+        else:
+            # Step 4: snake or ladder at the landing square (FR-06, FR-07).
+            landed = target
+            final, event = self._board.resolve(landed)
         player.position = final
 
         winner_index = None
@@ -38,6 +42,7 @@ class GameEngine:
             winner_index = index
             state.phase = Phase.GAME_OVER
         # TODO FR-08: step 6, an `elif` for the extra roll after a 6 (the turn does not pass).
+        # A 6 that overshoots gives no extra roll (SDD 3.2 step 3, decision D-1).
         else:
             # Step 7: pass the turn to the next player in setup order (FR-05).
             self._turns.advance(state)
@@ -46,7 +51,7 @@ class GameEngine:
             player_index=index,
             roll=roll,
             from_pos=from_pos,
-            landed_pos=target,
+            landed_pos=landed,
             final_pos=final,
             event=event,
             extra_roll=False,
