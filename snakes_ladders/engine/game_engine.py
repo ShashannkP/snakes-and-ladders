@@ -4,11 +4,14 @@ import random
 
 from snakes_ladders.engine.dice import DiceService
 from snakes_ladders.engine.models import Event, GameState, TurnResult
+from snakes_ladders.engine.turn_manager import TurnManager
 
 
 class GameEngine:
     def __init__(self, rng: random.Random | None = None) -> None:
         self._dice = DiceService(rng)
+        self._turns = TurnManager()
+
 
     def roll_and_move(self, state: GameState) -> TurnResult:
         """Roll once for the current player and apply the result (SDD 3.2)."""
@@ -26,8 +29,12 @@ class GameEngine:
         # TODO FR-06/07: step 4, board.resolve(target) for snakes and ladders.
         player.position = target
 
-        # TODO FR-09: step 5, win check.
-        # TODO FR-08/FR-05: steps 6-7, extra roll or pass the turn.
+        # TODO FR-09: step 5, win check (the turn does not pass if someone won).
+        # TODO FR-08: step 6, extra roll after a 6 (the turn does not pass).
+
+        # Step 7: pass the turn to the next player in setup order (FR-05).
+        self._turns.advance(state)
+
 
         return TurnResult(
             player_index=index,
@@ -38,5 +45,5 @@ class GameEngine:
             event=Event.NONE,
             extra_roll=False,
             winner_index=None,
-            next_index=index,
+            next_index=state.current_index,
         )

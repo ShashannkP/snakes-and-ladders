@@ -2,15 +2,12 @@
 
 import pytest
 
-from snakes_ladders.engine import Event, GameEngine, GameState, Player
+from snakes_ladders.engine import Event, GameEngine, Player
+from tests.engine.factories import make_state
 from tests.engine.scripted_rng import ScriptedRng
 
-COLOURS = ["blue", "orange", "green", "magenta"]
 
 
-def make_state(*positions: int) -> GameState:
-    players = [Player(f"P{i + 1}", COLOURS[i], pos) for i, pos in enumerate(positions)]
-    return GameState(players=players)
 
 
 def test_new_player_starts_at_zero():
