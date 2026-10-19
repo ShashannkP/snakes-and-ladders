@@ -8,7 +8,9 @@ from snakes_ladders.ui.widgets import BACKGROUND, TOKEN_COLOURS, button, label
 
 
 class SetupScreen:
-    def __init__(self):
+    def __init__(self, on_start=None):
+        self.on_start = on_start
+        self.start_button = pygame.Rect(60, 620, 180, 50)
         self.count = 2
         self.names = ["", "", "", ""]
         self.colours = list(COLOURS)
@@ -35,6 +37,10 @@ class SetupScreen:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.start_button.collidepoint(event.pos) and not self.validation_error():
+                if self.on_start is not None:
+                    self.on_start(self.configs())
+                return
             for count, rect in self.count_buttons:
                 if rect.collidepoint(event.pos):
                     self.count, self.active = count, min(self.active, count - 1)
@@ -70,3 +76,4 @@ class SetupScreen:
             label(surface, f"{i + 1}: {self.colours[i]}", (colour_rect.x + 12, colour_rect.y + 13), colour=(15, 20, 30))
         error = self.validation_error()
         label(surface, error or "Player details are valid.", (60, 560), 25, (255, 180, 145) if error else (110, 230, 165))
+        button(surface, self.start_button, "Start Game", not error and self.on_start is not None)

@@ -12,8 +12,10 @@ python -m snakes_ladders.main
 Choose 2–4 players, enter each name, and click token colours to cycle them.
 Names must be unique (ignoring case), contain 1–15 ASCII letters, digits or
 spaces, and cannot be blank. Colours must also be unique. Tab moves to the
-next name field. This branch provides the player setup screen; game starting
-is added by the Game Initialization issue.
+next name field. Start Game becomes available only when all selected players
+are valid. Players start at position 0 and take turns in setup order.
+The initial gameplay view lists positions; click Roll Dice or press Space to
+play. The graphical board and animations remain separate features.
 
 Run automated checks with `python -m pytest`.
 
