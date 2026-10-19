@@ -3,7 +3,7 @@
 import random
 
 from snakes_ladders.engine.dice import DiceService
-from snakes_ladders.engine.models import Event, GameState, TurnResult
+from snakes_ladders.engine.models import Event, GameState, Phase, TurnResult
 from snakes_ladders.engine.turn_manager import TurnManager
 from snakes_ladders.engine.board import Board
 
@@ -32,12 +32,15 @@ class GameEngine:
         final, event = self._board.resolve(target)
         player.position = final
 
-        # TODO FR-09: step 5, win check (the turn does not pass if someone won).
-        # TODO FR-08: step 6, extra roll after a 6 (the turn does not pass).
-
-        # Step 7: pass the turn to the next player in setup order (FR-05).
-        self._turns.advance(state)
-
+        winner_index = None
+        if final == Board.SIZE:
+            # Step 5: the player won; the game ends and the turn does not pass (FR-09).
+            winner_index = index
+            state.phase = Phase.GAME_OVER
+        # TODO FR-08: step 6, an `elif` for the extra roll after a 6 (the turn does not pass).
+        else:
+            # Step 7: pass the turn to the next player in setup order (FR-05).
+            self._turns.advance(state)
 
         return TurnResult(
             player_index=index,
@@ -47,6 +50,6 @@ class GameEngine:
             final_pos=final,
             event=event,
             extra_roll=False,
-            winner_index=None,
+            winner_index=winner_index,
             next_index=state.current_index,
         )
