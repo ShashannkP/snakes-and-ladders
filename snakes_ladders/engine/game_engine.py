@@ -5,12 +5,14 @@ import random
 from snakes_ladders.engine.dice import DiceService
 from snakes_ladders.engine.models import Event, GameState, TurnResult
 from snakes_ladders.engine.turn_manager import TurnManager
+from snakes_ladders.engine.board import Board
 
 
 class GameEngine:
     def __init__(self, rng: random.Random | None = None) -> None:
         self._dice = DiceService(rng)
         self._turns = TurnManager()
+        self._board = Board()
 
 
     def roll_and_move(self, state: GameState) -> TurnResult:
@@ -26,8 +28,9 @@ class GameEngine:
         from_pos = player.position
         target = from_pos + roll
         # TODO FR-10: step 3, overshoot past 100.
-        # TODO FR-06/07: step 4, board.resolve(target) for snakes and ladders.
-        player.position = target
+        # Step 4: snake or ladder at the landing square (FR-06, FR-07).
+        final, event = self._board.resolve(target)
+        player.position = final
 
         # TODO FR-09: step 5, win check (the turn does not pass if someone won).
         # TODO FR-08: step 6, extra roll after a 6 (the turn does not pass).
@@ -41,8 +44,8 @@ class GameEngine:
             roll=roll,
             from_pos=from_pos,
             landed_pos=target,
-            final_pos=target,
-            event=Event.NONE,
+            final_pos=final,
+            event=event,
             extra_roll=False,
             winner_index=None,
             next_index=state.current_index,
