@@ -7,16 +7,22 @@ from snakes_ladders.engine.models import Event
 # Snake head -> tail (SRS Appendix 4.3).
 SNAKES = {17: 7, 54: 34, 62: 19, 64: 60, 87: 36, 93: 73, 95: 75, 98: 79}
 
+# Ladder base -> top (SRS Appendix 4.3).
+LADDERS = {1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 51: 67, 72: 91, 80: 99}
+
 
 class Board:
     SIZE = 100
 
     def __init__(self) -> None:
         self.snakes = MappingProxyType(dict(SNAKES))
+        self.ladders = MappingProxyType(dict(LADDERS))
+
 
     def resolve(self, square: int) -> tuple[int, Event]:
         """Return the square a token ends on after landing on `square`, and why."""
         if square in self.snakes:
             return self.snakes[square], Event.SNAKE
-        # TODO FR-07: ladders.
+        if square in self.ladders:
+            return self.ladders[square], Event.LADDER
         return square, Event.NONE
