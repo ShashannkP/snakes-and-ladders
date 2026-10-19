@@ -23,4 +23,17 @@ class GameController:
         if self.screen != "game" or self.state is None or self.state.phase is not Phase.AWAITING_ROLL:
             return None
         self.last_result = self.engine.roll_and_move(self.state)
+        if self.last_result.winner_index is not None:
+            self.screen = "result"
         return self.last_result
+
+    def new_game_requested(self):
+        """Return to setup from results; the next Start creates fresh players."""
+        if self.screen == "result":
+            self.state = None
+            self.last_result = None
+            self.screen = "setup"
+
+    def exit_requested(self):
+        if self.screen == "result":
+            self.running = False

@@ -17,6 +17,10 @@ are valid. Players start at position 0 and take turns in setup order.
 The initial gameplay view lists positions; click Roll Dice or press Space to
 play. The graphical board and animations remain separate features.
 
+When a player reaches square 100, the Result screen announces the winner
+and lists all players by descending position. Ties retain setup order.
+New Game returns to a blank setup screen; Exit closes the application.
+
 Run automated checks with `python -m pytest`.
 
 Team members: 

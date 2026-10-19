@@ -4,6 +4,7 @@ import pygame
 
 from snakes_ladders.controller.game_controller import GameController
 from snakes_ladders.ui.game_screen import GameScreen
+from snakes_ladders.ui.result_screen import ResultScreen
 from snakes_ladders.ui.setup_screen import SetupScreen
 
 
@@ -14,14 +15,21 @@ def main():
         pygame.display.set_caption("Snakes and Ladders")
         pygame.key.start_text_input()
         controller = GameController()
-        screens = {"setup": SetupScreen(controller.start_new_game), "game": GameScreen(controller)}
+        screens = {
+            "setup": SetupScreen(controller.start_new_game),
+            "game": GameScreen(controller),
+            "result": ResultScreen(controller),
+        }
         clock = pygame.time.Clock()
         while controller.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     controller.running = False
                 else:
+                    previous_screen = controller.screen
                     screens[controller.screen].handle_event(event)
+                    if previous_screen != "setup" and controller.screen == "setup":
+                        screens["setup"] = SetupScreen(controller.start_new_game)
             screens[controller.screen].draw(surface)
             pygame.display.flip()
             clock.tick(60)
