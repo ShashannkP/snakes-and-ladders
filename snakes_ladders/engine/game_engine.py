@@ -3,7 +3,7 @@
 import random
 
 from snakes_ladders.engine.dice import DiceService
-from snakes_ladders.engine.models import Event, GameState, Phase, Player, TurnResult
+from snakes_ladders.engine.models import Event, GameState, Phase, Player, Standing, TurnResult
 from snakes_ladders.engine.setup import PlayerConfig, validate_setup
 from snakes_ladders.engine.turn_manager import TurnManager
 from snakes_ladders.engine.board import Board
@@ -22,6 +22,14 @@ class GameEngine:
             players=[Player(config.name, config.colour) for config in configs],
             extra_turn_enabled=extra_turn,
         )
+
+    def standings(self, state: GameState) -> list[Standing]:
+        """Rank by position; Python's stable sort preserves setup order for ties."""
+        ordered = sorted(enumerate(state.players), key=lambda item: -item[1].position)
+        return [
+            Standing(rank, index, player.name, player.colour, player.position)
+            for rank, (index, player) in enumerate(ordered, start=1)
+        ]
 
 
     def roll_and_move(self, state: GameState) -> TurnResult:

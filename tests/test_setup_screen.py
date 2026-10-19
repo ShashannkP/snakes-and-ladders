@@ -69,3 +69,54 @@ def test_four_player_selection_starts_all_players(surface):
     screen.draw(surface)
     screen.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=screen.start_button.center))
     assert len(controller.state.players) == 4
+
+
+def test_result_screen_buttons_and_rendering(surface):
+    from snakes_ladders.ui.result_screen import ResultScreen
+    from tests.test_results import finished_controller
+
+    controller = finished_controller()
+    screen = ResultScreen(controller)
+    screen.draw(surface)
+    screen.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=screen.new_game_button.center))
+    assert controller.screen == "setup"
+    controller = finished_controller()
+    screen = ResultScreen(controller)
+    screen.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=screen.exit_button.center))
+    assert not controller.running
+
+
+def test_application_flow_through_new_game_and_exit(surface, monkeypatch):
+    from snakes_ladders import main as app
+    from snakes_ladders.controller.game_controller import GameController
+    from snakes_ladders.engine import GameEngine
+    from tests.engine.scripted_rng import ScriptedRng
+
+    controller = GameController(GameEngine(rng=ScriptedRng([1])))
+    monkeypatch.setattr(app, "GameController", lambda: controller)
+    batches = iter([
+        [pygame.event.Event(pygame.TEXTINPUT, text="Sam"),
+         pygame.event.Event(pygame.KEYDOWN, key=pygame.K_TAB),
+         pygame.event.Event(pygame.TEXTINPUT, text="Alice"),
+         pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(100, 640))],
+        [pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE)],
+        [pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(100, 600))],
+        [pygame.event.Event(pygame.QUIT)],
+    ])
+    frame = 0
+
+    def events():
+        nonlocal frame
+        frame += 1
+        if frame == 2:
+            controller.state.players[0].position = 99
+        if frame == 3:
+            assert controller.screen == "result"
+        if frame == 4:
+            assert controller.screen == "setup"
+            assert controller.state is None
+        return next(batches)
+
+    monkeypatch.setattr(pygame.event, "get", events)
+    app.main()
+    assert not controller.running

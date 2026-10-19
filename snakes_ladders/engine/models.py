@@ -21,6 +21,15 @@ class Player:
     colour: str
     position: int = 0  # 0 = start position, outside the board
 
+
+@dataclass(frozen=True)
+class Standing:
+    rank: int
+    player_index: int
+    name: str
+    colour: str
+    position: int
+
 @dataclass
 class GameState:
     players: list[Player]
