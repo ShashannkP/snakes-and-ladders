@@ -1,0 +1,12 @@
+[project]
+name = "snakes-ladders"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["pygame>=2,<3"]
+
+[project.optional-dependencies]
+dev = ["pytest", "coverage", "pytest-timeout"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
