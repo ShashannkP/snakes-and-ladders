@@ -20,6 +20,9 @@ the top left. All eight snakes and eight ladders are drawn from the same
 layout used by the rules. Numbered, coloured tokens have separate slots so
 all four remain visible when sharing a square; players at position 0 appear
 in the Start area below the board. Click Roll Dice or press Space to play.
+During gameplay, the turn indicator always shows the current player's name
+and numbered token in their chosen colour. It updates when the turn passes
+to the next player.
 
 When a player reaches square 100, the Result screen announces the winner
 and lists all players by descending position alongside the final board.
