@@ -34,7 +34,10 @@ class GameScreen:
             winner = state.players[self.controller.last_result.winner_index]
             label(surface, f"Winner: {winner.name}", (700, 80), 32)
         else:
-            label(surface, f"Turn: {state.players[state.current_index].name}", (700, 80), 32)
+            current_player = state.players[state.current_index]
+            pygame.draw.circle(surface, TOKEN_COLOURS[current_player.colour], (720, 95), 20)
+            label(surface, str(state.current_index + 1), (714, 86), colour=(15, 20, 30))
+            label(surface, f"Turn: {current_player.name}", (755, 80), 32)
         label(surface, "Snakes: red curves", (700, 465), 25)
         label(surface, "Ladders: brown rails", (700, 495), 25)
         button(surface, self.roll_button, "Roll Dice (Space)", state.phase is Phase.AWAITING_ROLL)
