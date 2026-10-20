@@ -14,11 +14,16 @@ Names must be unique (ignoring case), contain 1–15 ASCII letters, digits or
 spaces, and cannot be blank. Colours must also be unique. Tab moves to the
 next name field. Start Game becomes available only when all selected players
 are valid. Players start at position 0 and take turns in setup order.
-The initial gameplay view lists positions; click Roll Dice or press Space to
-play. The graphical board and animations remain separate features.
+The gameplay view displays a 10 × 10 board numbered 1–100 in boustrophedon
+order: 1 starts at the bottom left, rows alternate direction, and 100 is at
+the top left. All eight snakes and eight ladders are drawn from the same
+layout used by the rules. Numbered, coloured tokens have separate slots so
+all four remain visible when sharing a square; players at position 0 appear
+in the Start area below the board. Click Roll Dice or press Space to play.
 
 When a player reaches square 100, the Result screen announces the winner
-and lists all players by descending position. Ties retain setup order.
+and lists all players by descending position alongside the final board.
+Ties retain setup order.
 New Game returns to a blank setup screen; Exit closes the application.
 
 Run automated checks with `python -m pytest`.
