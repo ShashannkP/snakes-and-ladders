@@ -54,12 +54,20 @@ class GameEngine:
         player.position = final
 
         winner_index = None
+        extra_roll = False
         if final == Board.SIZE:
             # Step 5: the player won; the game ends and the turn does not pass (FR-09).
             winner_index = index
             state.phase = Phase.GAME_OVER
-        # TODO FR-08: step 6, an `elif` for the extra roll after a 6 (the turn does not pass).
-        # A 6 that overshoots gives no extra roll (SDD 3.2 step 3, decision D-1).
+        elif (
+            event is not Event.OVERSHOOT
+            and state.extra_turn_enabled
+            and roll == DiceService.SIDES
+            and state.extra_rolls_used < 2
+        ):
+            # Step 6: a qualifying six retains the turn, up to two extra rolls (FR-08).
+            state.extra_rolls_used += 1
+            extra_roll = True
         else:
             # Step 7: pass the turn to the next player in setup order (FR-05).
             self._turns.advance(state)
@@ -71,7 +79,7 @@ class GameEngine:
             landed_pos=landed,
             final_pos=final,
             event=event,
-            extra_roll=False,
+            extra_roll=extra_roll,
             winner_index=winner_index,
             next_index=state.current_index,
         )
