@@ -100,7 +100,7 @@ def test_application_flow_through_new_game_and_exit(surface, monkeypatch):
          pygame.event.Event(pygame.TEXTINPUT, text="Alice"),
          pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(100, 640))],
         [pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE)],
-        [pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(100, 600))],
+        [pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=app.ResultScreen(controller).new_game_button.center)],
         [pygame.event.Event(pygame.QUIT)],
     ])
     frame = 0
