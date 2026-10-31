@@ -5,7 +5,7 @@ import math
 import pygame
 
 from snakes_ladders.engine.board import Board
-from snakes_ladders.ui.widgets import BACKGROUND, TOKEN_COLOURS, label
+from snakes_ladders.ui.widgets import BACKGROUND, MIN_FONT_SIZE, TOKEN_COLOURS, label
 
 
 class BoardView:
@@ -14,14 +14,15 @@ class BoardView:
     SNAKE_COLOUR = (183, 49, 76)
     LADDER_COLOUR = (125, 78, 20)
     CELL_COLOURS = ((232, 240, 221), (203, 222, 200))
-    TOKEN_OFFSETS = ((14, 34), (34, 34), (14, 50), (34, 50))
+    TOKEN_OFFSETS = ((14, 30), (36, 30), (14, 50), (36, 50))
+    TOKEN_RADIUS = 9
 
     def __init__(self):
         self.board = Board()
         # Cache the fixed artwork rather than rendering 100 labels each frame.
         self.artwork = pygame.Surface(self.RECT.size)
         self._draw_artwork()
-        self.token_font = pygame.font.Font(None, 16)
+        self.token_font = pygame.font.Font(None, MIN_FONT_SIZE)
 
     def square_rect(self, square):
         """1 is bottom left; 10 is bottom right; 100 is top left."""
@@ -46,7 +47,7 @@ class BoardView:
 
     def _anchor(self, square):
         rect = self.square_rect(square)
-        return pygame.Vector2(rect.x - self.RECT.x + 44, rect.y - self.RECT.y + 20)
+        return pygame.Vector2(rect.x - self.RECT.x + 50, rect.y - self.RECT.y + 10)
 
     def _draw_artwork(self):
         for square in range(1, 101):
@@ -97,7 +98,7 @@ class BoardView:
         label(surface, "START (0)", (40, 679), 23)
         for index, player in enumerate(players):
             center = self.token_center(player.position, index)
-            pygame.draw.circle(surface, BACKGROUND, center, 9)
-            pygame.draw.circle(surface, TOKEN_COLOURS[player.colour], center, 7)
+            pygame.draw.circle(surface, BACKGROUND, center, self.TOKEN_RADIUS + 1)
+            pygame.draw.circle(surface, TOKEN_COLOURS[player.colour], center, self.TOKEN_RADIUS)
             number = self.token_font.render(str(index + 1), True, (15, 20, 30))
             surface.blit(number, number.get_rect(center=center))

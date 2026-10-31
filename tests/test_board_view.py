@@ -68,7 +68,7 @@ def test_every_snake_and_ladder_has_visible_endpoints(surface):
             for square in (start, end):
                 rect = view.square_rect(square)
                 # Endpoints occupy the right half, away from numbers and tokens.
-                assert has_colour(surface, pygame.Rect(rect.x + 36, rect.y + 12, 20, 18), colour)
+                assert has_colour(surface, pygame.Rect(rect.x + 30, rect.y + 2, 29, 26), colour)
 
 
 def test_four_tokens_remain_distinct_on_every_square_and_at_start(surface):
