@@ -102,6 +102,7 @@ def test_roll_updates_the_board_and_results_keep_final_tokens_visible(surface):
     center = game.board_view.token_center(38, 0)
     assert has_colour(surface, pygame.Rect(center[0] - 7, center[1] - 7, 14, 14), TOKEN_COLOURS["blue"])
     controller.on_roll_requested()  # Alice's turn.
+    controller.on_animation_done()
     controller.state.players[0].position = 99
     controller.on_roll_requested()
     assert controller.screen == "result"

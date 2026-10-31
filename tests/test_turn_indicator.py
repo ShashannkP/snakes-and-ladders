@@ -88,6 +88,7 @@ def test_indicator_refreshes_when_starting_another_game(rendered_game):
     controller.start_new_game([PlayerConfig("Sam", "blue"), PlayerConfig("Alice", "orange")])
     screen = GameScreen(controller)
     controller.on_roll_requested()
+    controller.on_animation_done()
     assert_indicator(screen, rendered_game, "Alice", "orange", 2)
     controller.state.players[1].position = 99
     controller.on_roll_requested()

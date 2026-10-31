@@ -77,6 +77,7 @@ def test_one_hundred_full_games_preserve_rule_invariants(seed):
 
         assert result is not None, f"seed={seed}, roll={roll_count}: roll request was rejected"
         assert_turn_invariants(state, result, previous_index, previous_extra_rolls, seed)
+        controller.on_animation_done()
         if state.phase is Phase.GAME_OVER:
             assert controller.screen == "result", f"seed={seed}, roll={roll_count}"
             break
