@@ -4,7 +4,7 @@ import pytest
 
 from snakes_ladders.engine import GameEngine, Phase
 from tests.engine.test_factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 def make_extra_state(*positions, enabled=True):

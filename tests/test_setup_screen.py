@@ -90,7 +90,7 @@ def test_application_flow_through_new_game_and_exit(surface, monkeypatch):
     from snakes_ladders import main as app
     from snakes_ladders.controller.game_controller import GameController
     from snakes_ladders.engine import GameEngine
-    from tests.engine.scripted_rng import ScriptedRng
+    from tests.engine.test_scripted_rng import ScriptedRng
 
     controller = GameController(GameEngine(rng=ScriptedRng([1])))
     monkeypatch.setattr(app, "GameController", lambda: controller)

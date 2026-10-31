@@ -4,7 +4,7 @@ import pytest
 
 from snakes_ladders.engine import Event, GameEngine, Phase
 from tests.engine.test_factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 def test_overshoot_stays_and_turn_passes():

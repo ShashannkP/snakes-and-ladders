@@ -3,8 +3,8 @@ import pytest
 from snakes_ladders.controller.game_controller import GameController
 from snakes_ladders.engine import GameEngine, Phase
 from snakes_ladders.engine.setup import PlayerConfig
-from tests.engine.factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_factories import make_state
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 def test_standings_sorted_without_reordering_game_state():

@@ -5,7 +5,7 @@ import secrets
 import pytest
 
 from snakes_ladders.engine import DiceService
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 @pytest.mark.parametrize("value", [1, 2, 3, 4, 5, 6])
