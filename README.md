@@ -84,3 +84,16 @@ Non functional requirements:
 
 
 
+
+## Roll performance (NFR-01)
+
+Repeated UI labels use a bounded 512-entry rendered-text cache; fixed board
+artwork is already cached. Roll handling updates the engine synchronously,
+and the next frame presents the dice result and moved token without a delay.
+Run `python -m pytest tests/test_roll_performance.py -q -s` to time 50 roll
+inputs through the application's real event loop and display flip, checking
+the displayed dice result and token after every roll. Each sample must be
+at most one second. Headless SDL checks run in CI; repeat on the SRS 2.4
+minimum hardware (dual-core 2 GHz CPU, 4 GB RAM, 1280 x 720 display) with a
+real display to establish hardware acceptance. Cloud timings do not certify
+that hardware.
