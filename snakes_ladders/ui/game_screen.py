@@ -17,7 +17,10 @@ class GameScreen:
         clicked = event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.roll_button.collidepoint(event.pos)
         pressed = event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE
         if clicked or pressed:
-            self.controller.on_roll_requested()
+            if self.controller.on_roll_requested() is not None:
+                # No animation yet: finish the move at once. Replace when FR-13's animation lands.
+                self.controller.on_animation_done()
+
 
     def draw(self, surface):
         surface.fill(BACKGROUND)

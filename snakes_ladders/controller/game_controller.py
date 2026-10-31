@@ -20,12 +20,27 @@ class GameController:
         self.screen = "game"
 
     def on_roll_requested(self):
-        if self.screen != "game" or self.state is None or self.state.phase is not Phase.AWAITING_ROLL:
+        if not self._is_awaiting_roll():
             return None
         self.last_result = self.engine.roll_and_move(self.state)
         if self.last_result.winner_index is not None:
             self.screen = "result"
+        else:
+            self.state.phase = Phase.ANIMATING
         return self.last_result
+
+    def on_animation_done(self):
+        """The UI calls this when the token has finished moving (SDD 3.1)."""
+        if self.state is not None and self.state.phase is Phase.ANIMATING:
+            self.state.phase = Phase.AWAITING_ROLL
+
+    def on_save_requested(self):
+        """Saving is only allowed between rolls (FR-17). The write itself is FR-15."""
+        return self._is_awaiting_roll()
+
+    def _is_awaiting_roll(self):
+        return self.screen == "game" and self.state is not None and self.state.phase is Phase.AWAITING_ROLL
+
 
     def new_game_requested(self):
         """Return to setup from results; the next Start creates fresh players."""
