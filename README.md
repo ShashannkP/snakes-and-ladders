@@ -84,3 +84,19 @@ Non functional requirements:
 
 
 
+
+## Accessible text and tokens (NFR-13)
+
+UI text is clamped to at least 19 pixels, equivalent to 14 pt at the
+reference 96 DPI. Board token labels use the same minimum and have larger,
+non-overlapping slots; snake and ladder endpoints have their own corner.
+The four token colours use the Okabe-Ito palette and always carry distinct
+player numbers in the board, player legend, turn indicator and results.
+
+Run `python -m pytest tests/test_accessibility.py -q` for the minimum font
+size and token label checks. The suite simulates full protanopia,
+deuteranopia and tritanopia using the published Machado et al. (2009)
+linear-sRGB matrices. It checks pairwise CIE Lab separation (Delta E 76
+at least 10) and at least 4.5:1 number contrast in normal and simulated
+vision. These are regression checks, not a substitute for testing with users;
+number labels provide identification independently of colour perception.

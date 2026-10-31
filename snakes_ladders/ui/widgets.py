@@ -4,14 +4,17 @@ import pygame
 
 BACKGROUND = (21, 28, 43)
 TEXT = (237, 241, 249)
+# Pygame uses pixels: 14 pt at the reference 96 DPI rounds up to 19 px.
+MIN_FONT_SIZE = 19
+# Okabe-Ito palette; player numbers provide a second, non-colour identifier.
 TOKEN_COLOURS = {
-    "blue": (80, 160, 240), "orange": (240, 155, 65),
-    "green": (70, 195, 140), "magenta": (215, 100, 200),
+    "blue": (86, 180, 233), "orange": (230, 159, 0),
+    "green": (0, 158, 115), "magenta": (204, 121, 167),
 }
 
 
 def label(surface, text, position, size=26, colour=TEXT):
-    font = pygame.font.Font(None, size)
+    font = pygame.font.Font(None, max(MIN_FONT_SIZE, size))
     surface.blit(font.render(text, True, colour), position)
 
 
