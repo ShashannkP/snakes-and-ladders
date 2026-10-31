@@ -1,5 +1,7 @@
 """Small shared drawing helpers."""
 
+from functools import lru_cache
+
 import pygame
 
 BACKGROUND = (21, 28, 43)
@@ -13,9 +15,15 @@ TOKEN_COLOURS = {
 }
 
 
-def label(surface, text, position, size=26, colour=TEXT):
+@lru_cache(maxsize=512)
+def _render_label(text, size, colour):
+    """Bound memory use while avoiding font loading and rasterizing every frame."""
     font = pygame.font.Font(None, max(MIN_FONT_SIZE, size))
-    surface.blit(font.render(text, True, colour), position)
+    return font.render(text, True, colour)
+
+
+def label(surface, text, position, size=26, colour=TEXT):
+    surface.blit(_render_label(text, size, tuple(colour)), position)
 
 
 def button(surface, rect, text, enabled=True):
