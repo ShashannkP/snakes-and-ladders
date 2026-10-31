@@ -14,7 +14,7 @@ from snakes_ladders.engine.setup import PlayerConfig
 from snakes_ladders.ui import game_screen
 from snakes_ladders.ui.game_screen import GameScreen
 from snakes_ladders.ui.widgets import TEXT, TOKEN_COLOURS
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 @pytest.fixture

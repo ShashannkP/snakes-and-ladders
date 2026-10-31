@@ -3,8 +3,8 @@
 import pytest
 
 from snakes_ladders.engine import Event, GameEngine, Player
-from tests.engine.factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_factories import make_state
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 

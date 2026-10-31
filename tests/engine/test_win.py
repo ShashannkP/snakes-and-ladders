@@ -1,8 +1,8 @@
 """Tests for the win condition (FR-09)."""
 
 from snakes_ladders.engine import GameEngine, Phase
-from tests.engine.factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_factories import make_state
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 def test_reaching_100_wins():

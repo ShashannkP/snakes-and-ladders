@@ -3,8 +3,8 @@
 import pytest
 
 from snakes_ladders.engine import Board, Event, GameEngine
-from tests.engine.factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_factories import make_state
+from tests.engine.test_scripted_rng import ScriptedRng
 
 # Written out again from SRS 4.3 on purpose: the test must not trust the code's own table.
 SRS_LADDERS = {1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 51: 67, 72: 91, 80: 99}

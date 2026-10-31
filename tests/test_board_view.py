@@ -18,8 +18,8 @@ from snakes_ladders.ui.board_view import BoardView
 from snakes_ladders.ui.game_screen import GameScreen
 from snakes_ladders.ui.result_screen import ResultScreen
 from snakes_ladders.ui.widgets import BACKGROUND, TOKEN_COLOURS
-from tests.engine.factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_factories import make_state
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 @pytest.fixture

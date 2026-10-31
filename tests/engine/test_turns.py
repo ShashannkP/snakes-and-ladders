@@ -1,8 +1,8 @@
 """Tests for turn management (FR-05)."""
 
 from snakes_ladders.engine import GameEngine
-from tests.engine.factories import make_state
-from tests.engine.scripted_rng import ScriptedRng
+from tests.engine.test_factories import make_state
+from tests.engine.test_scripted_rng import ScriptedRng
 
 
 def roll_n(engine, state, n):
