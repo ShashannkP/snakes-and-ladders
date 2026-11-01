@@ -417,8 +417,8 @@ Rule tests use a scripted RNG, so every expected position below is exact. Square
 | TC-N12-1 | Log frame times during 20 moves (including long snake and ladder moves) on the minimum-hardware machine | Frame rate is 30 FPS or more (per-second average during animation, OI-7) | Sa | NFR-12 |
 | TC-N13-1 | Audit every text element at 1280 x 720 | All text is at least 14 pt (about 19 px at 96 DPI, OI-8) | Um | NFR-13 |
 | TC-N13-2 | Take screenshots of the Game screen and run them through protanopia, deuteranopia and tritanopia simulators | The 4 tokens can be told apart, and each also shows its number label | Um | NFR-13 |
-| TC-N14-1 | Sample the application's memory every second over a 30-minute session that includes 10 save/resume cycles and 4-player games | Peak memory is 200 MB or less | Sa | NFR-14 |
-| TC-N14-2 | Save the largest possible state (4 players, longest allowed names) and check the file size | Below 10 KB (10,240 bytes, OI-5) | Ua | NFR-14 |
+| TC-N14-1 | CI samples process RSS during 300 rendered gameplay frames; for release acceptance, sample the standalone application's memory every second over a 30-minute session with 10 save/resume cycles and 4-player games | Peak memory is 200 MB or less | Sa | NFR-14 |
+| TC-N14-2 | Save the largest possible state (4 players, longest allowed names), check the file size, and verify an oversized payload is rejected without replacing the previous save | At most 10,240 bytes (OI-5); oversized save leaves the previous file intact | Ua | NFR-14 |
 | TC-N15-1 | Take 60,000 rolls from the production `DiceService` and count each value (expected 10,000 each) | Chi-square statistic (5 degrees of freedom, 5% level) is below 11.07. Rerun policy in R1 | Ua | NFR-15 |
 
 ### 5.4 Test Data and Tools
