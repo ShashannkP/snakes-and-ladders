@@ -4,7 +4,7 @@ import pygame
 
 from snakes_ladders.controller.input_validator import validate_setup
 from snakes_ladders.engine.setup import COLOURS, InputValidationError, PlayerConfig
-from snakes_ladders.ui.widgets import BACKGROUND, TOKEN_COLOURS, button, label
+from snakes_ladders.ui.widgets import BACKGROUND, TEXT, TOKEN_COLOURS, _render_label, button, label
 
 
 class SetupScreen:
@@ -70,7 +70,12 @@ class SetupScreen:
             pygame.draw.rect(surface, (43, 53, 72), rect, border_radius=6)
             pygame.draw.rect(surface, (100, 180, 255) if i == self.active else (90, 100, 120), rect, 2, border_radius=6)
             label(surface, str(i + 1), (100, rect.y + 13))
-            label(surface, self.names[i] or "Enter name", (rect.x + 12, rect.y + 13))
+            name = self.names[i] or "Enter name"
+            preview = name
+            while _render_label(preview, 26, TEXT).get_width() > rect.width - 24:
+                name = name[1:]
+                preview = "…" + name
+            label(surface, preview, (rect.x + 12, rect.y + 13))
             colour_rect = self.colour_rect(i)
             pygame.draw.rect(surface, TOKEN_COLOURS[self.colours[i]], colour_rect, border_radius=6)
             label(surface, f"{i + 1}: {self.colours[i]}", (colour_rect.x + 12, colour_rect.y + 13), colour=(15, 20, 30))
