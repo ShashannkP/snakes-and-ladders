@@ -8,9 +8,13 @@ from snakes_ladders.ui.widgets import BACKGROUND, TEXT, TOKEN_COLOURS, _render_l
 
 
 class SetupScreen:
-    def __init__(self, on_start=None):
+    def __init__(self, on_start=None, on_resume=None, can_resume=None, controller=None):
         self.on_start = on_start
+        self.on_resume = on_resume
+        self.can_resume = can_resume
+        self.controller = controller
         self.start_button = pygame.Rect(60, 620, 180, 50)
+        self.resume_button = pygame.Rect(260, 620, 180, 50)
         self.count = 2
         self.names = ["", "", "", ""]
         self.colours = list(COLOURS)
@@ -41,6 +45,10 @@ class SetupScreen:
                 if self.on_start is not None:
                     self.on_start(self.configs())
                 return
+            if self.resume_button.collidepoint(event.pos):
+                if self.on_resume is not None:
+                    self.on_resume()
+                return
             for count, rect in self.count_buttons:
                 if rect.collidepoint(event.pos):
                     self.count, self.active = count, min(self.active, count - 1)
@@ -52,6 +60,8 @@ class SetupScreen:
         elif event.type == pygame.TEXTINPUT:
             # Bound the buffer even for a very large pasted text event.
             self.names[self.active] = (self.names[self.active] + event.text)[:64]
+        elif event.key_events if hasattr(event, "key_events") else False:
+            pass
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_BACKSPACE:
                 self.names[self.active] = self.names[self.active][:-1]
@@ -80,5 +90,18 @@ class SetupScreen:
             pygame.draw.rect(surface, TOKEN_COLOURS[self.colours[i]], colour_rect, border_radius=6)
             label(surface, f"{i + 1}: {self.colours[i]}", (colour_rect.x + 12, colour_rect.y + 13), colour=(15, 20, 30))
         error = self.validation_error()
-        label(surface, error or "Player details are valid.", (60, 560), 25, (255, 180, 145) if error else (110, 230, 165))
+        if self.controller and self.controller.error_message:
+            msg = self.controller.error_message
+            msg_color = (255, 180, 145)
+        elif error:
+            msg = error
+            msg_color = (255, 180, 145)
+        else:
+            msg = "Player details are valid."
+            msg_color = (110, 230, 165)
+        label(surface, msg, (60, 560), 25, msg_color)
         button(surface, self.start_button, "Start Game", not error and self.on_start is not None)
+
+        can_resume = self.can_resume() if callable(self.can_resume) else (self.on_resume is not None)
+        if can_resume or self.on_resume is not None:
+            button(surface, self.resume_button, "Resume Game", can_resume)

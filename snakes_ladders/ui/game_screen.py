@@ -12,15 +12,26 @@ class GameScreen:
         self.controller = controller
         self.board_view = BoardView()
         self.roll_button = pygame.Rect(700, 560, 220, 50)
+        self.save_button = pygame.Rect(700, 625, 140, 45)
 
     def handle_event(self, event):
-        clicked = event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.roll_button.collidepoint(event.pos)
-        pressed = event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE
-        if clicked or pressed:
+        clicked_roll = (
+            event.type == pygame.MOUSEBUTTONDOWN
+            and event.button == 1
+            and self.roll_button.collidepoint(event.pos)
+        )
+        pressed_space = event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE
+        clicked_save = (
+            event.type == pygame.MOUSEBUTTONDOWN
+            and event.button == 1
+            and self.save_button.collidepoint(event.pos)
+        )
+        if clicked_roll or pressed_space:
             if self.controller.on_roll_requested() is not None:
                 # No animation yet: finish the move at once. Replace when FR-13's animation lands.
                 self.controller.on_animation_done()
-
+        elif clicked_save:
+            self.controller.on_save_requested()
 
     def draw(self, surface):
         surface.fill(BACKGROUND)
@@ -46,3 +57,9 @@ class GameScreen:
         button(surface, self.roll_button, "Roll Dice (Space)", state.phase is Phase.AWAITING_ROLL)
         if state.last_roll is not None:
             label(surface, f"Last roll: {state.last_roll}", (950, 575))
+
+        button(surface, self.save_button, "Save Game", state.phase is Phase.AWAITING_ROLL)
+        if self.controller.status_message:
+            label(surface, self.controller.status_message, (860, 635), 22, (110, 230, 165))
+        elif self.controller.error_message:
+            label(surface, self.controller.error_message, (860, 635), 22, (255, 180, 145))

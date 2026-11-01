@@ -31,6 +31,21 @@ class GameEngine:
             for rank, (index, player) in enumerate(ordered, start=1)
         ]
 
+    def from_saved(self, data: dict) -> GameState:
+        """Restore domain state from validated save data (SDD 3.6.2)."""
+        players = [
+            Player(name=p["name"], colour=p["colour"], position=p["position"])
+            for p in data["players"]
+        ]
+        return GameState(
+            players=players,
+            current_index=data["current_index"],
+            extra_turn_enabled=data["extra_turn_enabled"],
+            extra_rolls_used=data.get("extra_rolls_used", 0),
+            last_roll=data.get("last_roll"),
+            phase=Phase.AWAITING_ROLL,
+        )
+
 
     def roll_and_move(self, state: GameState) -> TurnResult:
         """Roll once for the current player and apply the result (SDD 3.2)."""
