@@ -113,3 +113,15 @@ at most one second. Headless SDL checks run in CI; repeat on the SRS 2.4
 minimum hardware (dual-core 2 GHz CPU, 4 GB RAM, 1280 x 720 display) with a
 real display to establish hardware acceptance. Cloud timings do not certify
 that hardware.
+
+## Four-player scalability (NFR-07)
+
+The same performance check runs separately with two and four players, with
+50 roll inputs per configuration and the same one-second limit for every
+sample. Both keyboard and mouse inputs run through the actual application
+event loop. Each presented frame is checked for a newly executed roll,
+correct turn order, the visible dice result and all players' tokens.
+Run `python -m pytest tests/test_roll_performance.py -q -s` to print both
+timing reports. No relative speed threshold replaces the one-second limit.
+Repeat this check on the SRS 2.4 minimum hardware for hardware acceptance;
+headless cloud results validate the workflow on the current machine only.
