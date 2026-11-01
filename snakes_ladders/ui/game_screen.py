@@ -3,6 +3,7 @@
 import pygame
 
 from snakes_ladders.engine import Phase
+from snakes_ladders.ui.animation import TokenAnimation
 from snakes_ladders.ui.board_view import BoardView
 from snakes_ladders.ui.widgets import BACKGROUND, TOKEN_COLOURS, button, label
 
@@ -13,6 +14,22 @@ class GameScreen:
         self.board_view = BoardView()
         self.roll_button = pygame.Rect(700, 560, 220, 50)
         self.save_button = pygame.Rect(700, 625, 140, 45)
+        self.animation = None
+
+    def update(self, seconds):
+        if self.animation is None:
+            return
+        self.animation.update(seconds)
+        if self.animation.finished:
+            self.animation.log_result()
+            self.animation = None
+            self.controller.on_animation_done()
+            if self.controller.state.phase is Phase.GAME_OVER:
+                self.controller.screen = "result"
+
+    def record_frame(self, timestamp):
+        if self.animation is not None:
+            self.animation.record_frame(timestamp)
 
     def handle_event(self, event):
         clicked_roll = (
@@ -27,9 +44,12 @@ class GameScreen:
             and self.save_button.collidepoint(event.pos)
         )
         if clicked_roll or pressed_space:
-            if self.controller.on_roll_requested() is not None:
-                # No animation yet: finish the move at once. Replace when FR-13's animation lands.
-                self.controller.on_animation_done()
+            result = self.controller.on_roll_requested()
+            if result is not None:
+                self.animation = TokenAnimation(self.board_view, result)
+                # Keep the board visible until a winning token reaches square 100.
+                self.controller.screen = "game"
+                self.update(0)
         elif clicked_save:
             self.controller.on_save_requested()
 
@@ -37,7 +57,7 @@ class GameScreen:
         surface.fill(BACKGROUND)
         state = self.controller.state
         label(surface, "Snakes and Ladders", (40, 15), 38)
-        self.board_view.draw(surface, state.players)
+        self.board_view.draw(surface, state.players, self.animation)
         label(surface, "Players", (700, 150), 30)
         for i, player in enumerate(state.players):
             y = 200 + i * 75

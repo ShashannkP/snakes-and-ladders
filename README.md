@@ -193,3 +193,23 @@ for visual inspection are written to pytest's temporary directory (use
 `--basetemp=/tmp/nfr09-validation` for a predictable location). The screens
 were visually inspected at all three sizes in headless SDL; native desktop
 window-manager behaviour remains a manual check on each supported OS.
+
+## Animation responsiveness (NFR-12)
+
+Rolls now animate the numbered token along the numbered squares, followed
+by any snake or ladder transition, using elapsed time rather than frame
+counts. A complete move lasts 250 ms, with a 60 FPS presentation target.
+The event loop continues processing resize and quit events; roll and save
+requests are ignored until movement completes. A winning move finishes on
+the board before the result screen opens. Overshoots do not animate.
+
+Launching `python -m snakes_ladders.main` logs the presented frame count,
+average FPS and minimum FPS for each measured move. Minimum FPS is derived
+from the longest interval between presented frames; animations with fewer
+than two samples are not reported as passing. Run
+`python -m pytest tests/test_animation.py::test_twenty_animated_moves_meet_thirty_fps -q -s`
+to log and verify at least 30 FPS over 20 real event-loop moves with four
+players. The NFR-01/NFR-07 tests now time each input through the final
+animated frame, retaining their one-second deadline. Cloud/headless results
+are not minimum-hardware certification: repeat the 20-move check on the
+SRS 2.4 hardware with a native display.

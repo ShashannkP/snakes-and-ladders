@@ -93,11 +93,13 @@ class BoardView:
             pygame.draw.rect(self.artwork, colour, (rect.x + 2, rect.y + 2, 26, 16))
             label(self.artwork, str(square), (rect.x + 4, rect.y + 3), 19, (28, 48, 39))
 
-    def draw(self, surface, players):
+    def draw(self, surface, players, animation=None):
         surface.blit(self.artwork, self.RECT)
         label(surface, "START (0)", (40, 679), 23)
         for index, player in enumerate(players):
             center = self.token_center(player.position, index)
+            if animation is not None and index == animation.player_index:
+                center = tuple(round(value) for value in animation.center)
             pygame.draw.circle(surface, BACKGROUND, center, self.TOKEN_RADIUS + 1)
             pygame.draw.circle(surface, TOKEN_COLOURS[player.colour], center, self.TOKEN_RADIUS)
             number = self.token_font.render(str(index + 1), True, (15, 20, 30))
