@@ -45,6 +45,7 @@ def main():
         while controller.running:
             seconds = pacer.begin_frame()
             started = perf_counter()
+            animation_at_frame_start = screens["game"].animation
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     controller.running = False
@@ -63,7 +64,10 @@ def main():
                     if previous_screen != "setup" and controller.screen == "setup":
                         screens["setup"] = make_setup()
             events_done = perf_counter()
-            if controller.screen == "game":
+            if (controller.screen == "game"
+                    and screens["game"].animation is animation_at_frame_start):
+                # A move started by this frame's input must not consume time
+                # spent sleeping on the idle screen before that input.
                 screens["game"].update(seconds)
             update_done = perf_counter()
             dirty = screens[controller.screen].draw(canvas)
@@ -85,7 +89,8 @@ def main():
                         last_wait*1000, pygame.display.get_driver())
             last_flip = flipped
             wait_started = perf_counter()
-            pacer.wait()
+            animating = controller.screen == "game" and screens["game"].animation is not None
+            pacer.wait(precise=animating)
             last_wait = perf_counter() - wait_started
     finally:
         pygame.quit()

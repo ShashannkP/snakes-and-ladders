@@ -232,3 +232,11 @@ Slow gameplay frames log separate event, update, drawing, presentation,
 display-flip and previous-wait times, plus the SDL driver, so platform CI
 failures identify the expensive stage. These diagnostics do not change
 measured frame rates or the strict 30 FPS acceptance assertion.
+
+Active token animations use the precise pacing path with no sleep calls:
+macOS background timer coalescing was observed stretching requested frame
+waits to 50–140 ms despite sub-millisecond drawing. Only the short movement
+interval uses a deadline spin; inactive screens keep the lower-CPU sleep
+path. This can occupy one CPU core during movement and deliberately trades
+that bounded CPU cost for avoiding coalesced sleep delays. Actual elapsed
+frame intervals are still measured and checked without adjustment.

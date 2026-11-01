@@ -17,12 +17,16 @@ class FramePacer:
         self.deadline = now + self.period
         return elapsed
 
-    def wait(self):
+    def wait(self, precise=False):
         # Sleep for most of the interval. Finish the last millisecond using
         # the high-resolution clock rather than an SDL millisecond delay.
         # Rendering time counts towards the budget; late frames never sleep.
         remaining = self.deadline - self.timer()
-        if remaining > .001:
+        # Some background macOS processes coalesce sleeps to 50–140 ms.
+        # During a short active animation, do not enter a sleep at all:
+        # even sleeping for the bulk of the interval can miss the deadline.
+        # Idle screens retain the lower-CPU sleep path.
+        if not precise and remaining > .001:
             self.sleeper(remaining - .001)
         while self.timer() < self.deadline:
             pass

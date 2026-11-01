@@ -49,3 +49,13 @@ def test_oversleep_is_counted_and_next_deadline_starts_from_actual_time():
     assert pacer.begin_frame() >= .060
     assert pacer.deadline > clock.now
     assert len(clock.sleeps) == 1
+
+
+def test_active_animation_never_uses_coalesced_sleep():
+    clock = Clock(oversleep=.120)
+    pacer = FramePacer(60, clock.timer, clock.sleep)
+    pacer.begin_frame()
+    clock.now += .001  # Rendering work takes one millisecond.
+    pacer.wait(precise=True)
+    assert clock.sleeps == []
+    assert pacer.begin_frame() == pytest.approx(1 / 60, abs=.0001)
