@@ -125,3 +125,22 @@ Run `python -m pytest tests/test_roll_performance.py -q -s` to print both
 timing reports. No relative speed threshold replaces the one-second limit.
 Repeat this check on the SRS 2.4 minimum hardware for hardware acceptance;
 headless cloud results validate the workflow on the current machine only.
+
+## Display compatibility (NFR-09)
+
+The window can be resized from the minimum 1280 x 720 up to 1920 x 1080.
+Setup, gameplay and results share a logical 1280 x 720 canvas, scaled
+uniformly to fit the window without cropping or stretching. Different
+aspect ratios leave centred margins. Mouse positions are mapped back to
+the logical controls; clicks in margins are ignored. Text entry retains
+the full buffer and shows an ellipsis preview when pasted text exceeds
+the name field's width.
+
+Run `python -m pytest tests/test_resolution_compatibility.py -q` to check
+1280x720, 1366x768 and 1920x1080. Tests render all screens with four
+maximum-length player names, check text bounds and overlap, and exercise
+resized mouse input through setup, rolling, results and New Game. PNGs
+for visual inspection are written to pytest's temporary directory (use
+`--basetemp=/tmp/nfr09-validation` for a predictable location). The screens
+were visually inspected at all three sizes in headless SDL; native desktop
+window-manager behaviour remains a manual check on each supported OS.
