@@ -29,6 +29,13 @@ and lists all players by descending position alongside the final board.
 Ties retain setup order.
 New Game returns to a blank setup screen; Exit closes the application.
 
+## Save and resume integrity (NFR-08)
+
+The save/resume regression test compares every saved gameplay field through
+20 round trips across two-, three- and four-player states. Five cycles also
+save immediately after resuming and verify a second restore. Run
+`python -m pytest tests/test_data_integrity.py -q`.
+
 Run automated checks with `python -m pytest`.
 
 Team members: 
