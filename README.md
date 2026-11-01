@@ -221,3 +221,14 @@ invalidate the cache; resize/exposure forces a full presentation. At the
 native 1280 x 720 size only the damaged areas are copied to the window;
 larger viewports retain proportional scaling. The strict 20-move 30 FPS
 check remains enabled in the ordinary CI suite, including coverage runs.
+
+Frame pacing uses monotonic high-resolution deadlines instead of SDL's
+millisecond delay timer. Render work is subtracted from the frame budget;
+the scheduler sleeps for most of the remainder and finishes at most the
+last millisecond against the high-resolution clock. Late frames do not
+sleep or substitute a nominal frame duration for elapsed time. This uses
+a small amount of extra CPU to avoid depending on SDL delay precision.
+Slow gameplay frames log separate event, update, drawing, presentation,
+display-flip and previous-wait times, plus the SDL driver, so platform CI
+failures identify the expensive stage. These diagnostics do not change
+measured frame rates or the strict 30 FPS acceptance assertion.
