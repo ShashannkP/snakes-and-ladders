@@ -36,6 +36,7 @@ def main():
             "result": ResultScreen(controller),
         }
         clock = pygame.time.Clock()
+        force_redraw = True
         while controller.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -43,6 +44,9 @@ def main():
                 elif event.type == pygame.VIDEORESIZE:
                     size = (max(LOGICAL_SIZE[0], event.w), max(LOGICAL_SIZE[1], event.h))
                     surface = pygame.display.set_mode(size, pygame.RESIZABLE)
+                    force_redraw = True
+                elif event.type == pygame.WINDOWEXPOSED:
+                    force_redraw = True
                 else:
                     event = logical_event(event, viewport_rect(surface.get_size()))
                     if event is None:
@@ -53,8 +57,9 @@ def main():
                         screens["setup"] = make_setup()
             if controller.screen == "game":
                 screens["game"].update(clock.get_time() / 1000)
-            screens[controller.screen].draw(canvas)
-            present(canvas, surface)
+            dirty = screens[controller.screen].draw(canvas)
+            present(canvas, surface, None if force_redraw else dirty)
+            force_redraw = False
             pygame.display.flip()
             if controller.screen == "game":
                 screens["game"].record_frame(perf_counter())

@@ -207,18 +207,17 @@ Launching `python -m snakes_ladders.main` logs the presented frame count,
 average FPS and minimum FPS for each measured move. Minimum FPS is derived
 from the longest interval between presented frames; animations with fewer
 than two samples are not reported as passing. Run
-`python -m pytest tests/test_animation.py::test_twenty_animated_moves_meet_thirty_fps --run-fps-benchmark -q -s`
+`python -m pytest tests/test_animation.py::test_twenty_animated_moves_meet_thirty_fps -q -s`
 to log and verify at least 30 FPS over 20 real event-loop moves with four
 players. The NFR-01/NFR-07 tests now time each input through the final
 animated frame, retaining their one-second deadline. Cloud/headless results
 are not minimum-hardware certification: repeat the 20-move check on the
 SRS 2.4 hardware with a native display.
 
-The strict FPS benchmark is opt-in and is not run under the shared-runner
-coverage matrix: virtualized OS scheduling, instrumentation and display
-backends can change measured FPS and do not establish minimum-hardware
-acceptance. Ordinary CI still renders and logs all 20 moves, checks
-completion and sample counts, and deterministically verifies 60 FPS,
-30 FPS, a 10 FPS stalled frame, and time-based completion after a stall.
-The benchmark retains the strict 30 FPS assertion for every measured move.
-A normal CI pass with the benchmark skipped does not certify NFR-12 FPS.
+During movement, the gameplay renderer caches the board/sidebar and
+stationary tokens. Subsequent frames restore only the moving token's old
+and new bounds, then paint its numbered sprite. Scene/state changes
+invalidate the cache; resize/exposure forces a full presentation. At the
+native 1280 x 720 size only the damaged areas are copied to the window;
+larger viewports retain proportional scaling. The strict 20-move 30 FPS
+check remains enabled in the ordinary CI suite, including coverage runs.

@@ -15,6 +15,9 @@ class GameScreen:
         self.roll_button = pygame.Rect(700, 560, 220, 50)
         self.save_button = pygame.Rect(700, 625, 140, 45)
         self.animation = None
+        self._animation_background = None
+        self._background_key = None
+        self._previous_token_rect = None
 
     def update(self, seconds):
         if self.animation is None:
@@ -54,10 +57,43 @@ class GameScreen:
             self.controller.on_save_requested()
 
     def draw(self, surface):
+        if self.animation is None:
+            self._animation_background = None
+            self._background_key = None
+            self._previous_token_rect = None
+            self._draw_scene(surface)
+            return None
+
+        state = self.controller.state
+        # Include mutable scene data so resize, status or game-state changes
+        # cannot leave a stale sidebar or stale stationary tokens in the cache.
+        key = (id(surface), id(self.animation), state.current_index, state.phase,
+               state.last_roll, self.controller.status_message, self.controller.error_message,
+               tuple((p.name, p.colour, p.position) for p in state.players))
+        full_redraw = key != self._background_key
+        if full_redraw:
+            self._draw_scene(surface, exclude_player=self.animation.player_index)
+            self._animation_background = surface.copy()
+            self._background_key = key
+            self._previous_token_rect = None
+        center = tuple(round(value) for value in self.animation.center)
+        radius = self.board_view.TOKEN_RADIUS + 1
+        rect = pygame.Rect(center[0] - radius, center[1] - radius, 2 * radius + 1, 2 * radius + 1)
+        dirty = [rect]
+        if self._previous_token_rect is not None:
+            dirty.append(self._previous_token_rect)
+        for area in dirty:
+            surface.blit(self._animation_background, area, area)
+        index = self.animation.player_index
+        self.board_view.draw_token(surface, state.players[index], index, center)
+        self._previous_token_rect = rect
+        return None if full_redraw else dirty
+
+    def _draw_scene(self, surface, exclude_player=None):
         surface.fill(BACKGROUND)
         state = self.controller.state
         label(surface, "Snakes and Ladders", (40, 15), 38)
-        self.board_view.draw(surface, state.players, self.animation)
+        self.board_view.draw(surface, state.players, exclude_player=exclude_player)
         label(surface, "Players", (700, 150), 30)
         for i, player in enumerate(state.players):
             y = 200 + i * 75
