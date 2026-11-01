@@ -3,6 +3,7 @@
 import logging
 import os
 import re
+from types import SimpleNamespace
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
@@ -68,7 +69,7 @@ def test_overshoot_has_no_spurious_animation():
         pygame.quit()
 
 
-def test_twenty_animated_moves_meet_thirty_fps(monkeypatch, caplog):
+def measure_twenty_moves(monkeypatch, caplog):
     controller = controller_for([1] * 20, count=4)
     monkeypatch.setattr(app, "GameController", lambda: controller)
     caplog.set_level(logging.INFO, logger="snakes_ladders.animation")
@@ -93,4 +94,62 @@ def test_twenty_animated_moves_meet_thirty_fps(monkeypatch, caplog):
     for record in records:
         print(record)
         assert int(re.search(r"frames=(\d+)", record)[1]) >= 2
+        assert float(re.search(r"minimum_fps=([\d.]+)", record)[1]) > 0
+    return records
+
+
+def test_twenty_animated_moves_finish_and_log_real_frame_rates(monkeypatch, caplog):
+    # Portable integration check: shared CI/coverage is not SRS minimum hardware.
+    measure_twenty_moves(monkeypatch, caplog)
+
+
+@pytest.mark.fps_benchmark
+def test_twenty_animated_moves_meet_thirty_fps(monkeypatch, caplog):
+    for record in measure_twenty_moves(monkeypatch, caplog):
         assert float(re.search(r"minimum_fps=([\d.]+)", record)[1]) >= MIN_FPS, record
+
+
+def make_animation():
+    board = SimpleNamespace(token_center=lambda square, index: (square * 60, index * 20))
+    result = SimpleNamespace(player_index=0, from_pos=0, landed_pos=6, final_pos=6)
+    return TokenAnimation(board, result)
+
+
+@pytest.mark.parametrize("intervals,expected", [
+    ([1 / 60] * 10, 60), ([1 / 30] * 10, 30),
+    ([1 / 60, 1 / 60, .1, 1 / 60], 10),
+])
+def test_minimum_fps_uses_worst_frame_interval(caplog, intervals, expected):
+    animation = make_animation()
+    caplog.set_level(logging.INFO, logger="snakes_ladders.animation")
+    timestamp = 100.0
+    animation.record_frame(timestamp)
+    for interval in intervals:
+        timestamp += interval
+        animation.record_frame(timestamp)
+    animation.log_result()
+    message = caplog.records[-1].getMessage()
+    measured = float(re.search(r"minimum_fps=([\d.]+)", message)[1])
+    assert measured == pytest.approx(expected, abs=.01)
+    # A stalled frame must fail the same threshold used by the real benchmark.
+    assert (measured >= MIN_FPS) == (expected >= MIN_FPS)
+
+
+def test_animation_catches_up_after_slow_frame_without_changing_duration():
+    animation = make_animation()
+    animation.update(.2)
+    assert not animation.finished
+    assert animation.center.x == pytest.approx(288)
+    animation.update(.1)  # Simulate a long scheduling/rendering stall.
+    assert animation.finished
+    assert animation.center == animation.points[-1]
+
+
+@pytest.mark.parametrize("frames", [0, 1])
+def test_unmeasured_animation_is_not_reported_as_passing(caplog, frames):
+    animation = make_animation()
+    caplog.set_level(logging.INFO, logger="snakes_ladders.animation")
+    if frames:
+        animation.record_frame(100)
+    animation.log_result()
+    assert not caplog.records
