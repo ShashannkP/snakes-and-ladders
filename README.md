@@ -131,6 +131,15 @@ by hand on each OS with a real display: launch with
 finish a game, start a new game, and exit. The save, exit and resume steps
 of TC-N05-1 are added once FR-15 exists.
 
+## Offline availability (NFR-04)
+
+The application has no network service dependency. `tests/test_availability.py`
+scans application imports for networking modules and launches the real app
+while Python socket creation, connection and DNS APIs are blocked. The test
+verifies that the setup screen is drawn and runs in CI on Windows, Ubuntu and
+macOS. For release acceptance, also repeat the launch and gameplay smoke test
+with the network adapter disabled on each supported OS; the automated socket
+trap does not replace OS-level network tracing.
 
 ## Four-player scalability (NFR-07)
 
