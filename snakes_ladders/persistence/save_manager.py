@@ -119,11 +119,16 @@ class SaveManager:
             "checksum": checksum,
         }
 
+        text_data = json.dumps(payload, indent=2)
+        content_bytes = text_data.encode("utf-8")
+        if len(content_bytes) > MAX_SAVE_SIZE:
+            logger.warning("SaveTooLargeError: payload exceeds %d bytes", MAX_SAVE_SIZE)
+            raise SaveTooLargeError("Save file exceeds the 10 KB limit.")
+
         try:
             self.directory.mkdir(parents=True, exist_ok=True)
-            text_data = json.dumps(payload, indent=2)
-            with open(self.temp_path, "w", encoding="utf-8") as f:
-                f.write(text_data)
+            with open(self.temp_path, "wb") as f:
+                f.write(content_bytes)
                 f.flush()
                 os.fsync(f.fileno())
             os.replace(self.temp_path, self.save_path)

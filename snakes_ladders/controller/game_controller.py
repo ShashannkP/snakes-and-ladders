@@ -8,6 +8,7 @@ from snakes_ladders.persistence import (
     SaveError,
     SaveManager,
     SaveNotFoundError,
+    SaveTooLargeError,
     SaveWriteError,
 )
 
@@ -61,6 +62,11 @@ class GameController:
             self.status_message = "Game saved."
             self.error_message = None
             return True
+        except SaveTooLargeError as error:
+            logger.warning("SaveTooLargeError: %s", error)
+            self.error_message = str(error)
+            self.status_message = None
+            return False
         except SaveWriteError as error:
             logger.error("SaveWriteError: %s", error)
             self.error_message = "Could not save the game."

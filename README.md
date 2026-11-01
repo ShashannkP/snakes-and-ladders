@@ -153,6 +153,21 @@ timing reports. No relative speed threshold replaces the one-second limit.
 Repeat this check on the SRS 2.4 minimum hardware for hardware acceptance;
 headless cloud results validate the workflow on the current machine only.
 
+## Resource efficiency (NFR-14)
+
+Save files are limited to 10 KiB (10,240 bytes) before any temporary file is
+written. Run `python -m pytest tests/test_resource_efficiency.py -q` to check
+the largest valid four-player save, oversized-save rejection, and process RSS
+during 300 rendered gameplay frames. The test uses `psutil` and gates peak
+resident memory at 200 MB.
+
+For release acceptance, sample the standalone application's working set at
+one-second intervals for 30 minutes, including four-player games and 10
+save/resume cycles, using the OS task manager or an equivalent process monitor.
+The peak must remain at or below 200 MB; also verify the resulting
+`savegame.json` is at most 10,240 bytes. The automated test is a regression
+check, not a substitute for this full-duration run on target hardware.
+
 ## Display compatibility (NFR-09)
 
 The window can be resized from the minimum 1280 x 720 up to 1920 x 1080.

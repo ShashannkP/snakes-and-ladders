@@ -409,9 +409,15 @@ sequenceDiagram
         SVM->>SVM: build state dict (to_dict)
         SVM->>CKS: compute(state dict)
         CKS-->>SVM: sha256 hex
-        SVM->>FS: write savegame.json.tmp, flush, fsync
-        SVM->>FS: os.replace(tmp, savegame.json)
-        Note over SVM,FS: previous save stays valid until the rename succeeds
+        SVM->>SVM: serialize UTF-8 and enforce 10,240-byte limit
+        alt payload exceeds 10,240 bytes
+            SVM-->>GC: raise SaveTooLargeError
+            GC-->>P: "Save file exceeds the 10 KB limit."
+        else within limit
+            SVM->>FS: write savegame.json.tmp, flush, fsync
+            SVM->>FS: os.replace(tmp, savegame.json)
+            Note over SVM,FS: previous save stays valid until the rename succeeds
+        end
         alt OSError at any step
             SVM->>FS: delete tmp (best effort)
             SVM-->>GC: raise SaveWriteError
@@ -459,6 +465,7 @@ SnlError (base)
 | E-10 | OS error writing save | `SaveWriteError` | "Could not save the game." | Previous save intact; game continues | NFR-11 |
 | E-11 | Engine invariant broken | `EngineInvariantError` | "An unexpected error occurred. Returning to the start screen." | Log, reset to Start | NFR-03, NFR-10 |
 | E-12 | Any other unhandled exception in the main loop | `Exception` (top-level guard) | Same as E-11 | Log with traceback to `snl.log`; return to Start | NFR-10 |
+| E-13 | Serialized save exceeds 10,240 bytes | `SaveTooLargeError` | "Save file exceeds the 10 KB limit." | Previous save stays intact; game continues | NFR-14 |
 
 The message text for E-06 to E-09 is deliberately identical, which satisfies SEC-02 and avoids telling an attacker which check failed. The specific code is written to the log only.
 
@@ -575,7 +582,7 @@ def validate_setup(configs: list[PlayerConfig]) -> None: ...   # count 2..4, uni
 ### 3.7 Performance and Responsiveness Design
 * The engine resolves a whole turn in microseconds; the UI shows the dice value immediately and then animates the returned `TurnResult`, so NFR-01 (at most 1 s) is met by construction and FR-13 is satisfied when the animation total is under 1 s.
 * The render loop is capped at 60 FPS with a floor target of 30 FPS (NFR-12). Board and static layers are pre-rendered to a cached surface; only tokens and the dice value are redrawn per frame.
-* Memory: one cached board surface and small state objects, well under the 200 MB limit (NFR-14).
+* Memory: one cached board surface and small state objects. `tests/test_resource_efficiency.py` samples process RSS while rendering 300 gameplay frames and enforces the 200 MB limit; the 30-minute soak remains a release acceptance check (NFR-14).
 * The UI scales by computing a scale factor from the window size and deriving all coordinates from it, avoiding clipping between 1280x720 and 1920x1080 (NFR-09). Minimum font size is 14 pt (NFR-13).
 
 ### 3.8 Accessibility Design (NFR-13)

@@ -5,7 +5,7 @@ requires-python = ">=3.10"
 dependencies = ["pygame>=2,<3"]
 
 [project.optional-dependencies]
-dev = ["pytest", "coverage", "pytest-timeout"]
+dev = ["pytest", "coverage", "pytest-timeout", "psutil"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
