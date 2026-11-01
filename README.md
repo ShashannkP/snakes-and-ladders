@@ -114,6 +114,24 @@ minimum hardware (dual-core 2 GHz CPU, 4 GB RAM, 1280 x 720 display) with a
 real display to establish hardware acceptance. Cloud timings do not certify
 that hardware.
 
+## Portability (NFR-05)
+
+The same source tree must run on Windows 10/11, Ubuntu 22.04+ and macOS 13+.
+CI runs the full test suite on Windows, Ubuntu 22.04, the latest Ubuntu and
+the latest macOS, on Python 3.10 and 3.12. `tests/test_portability.py` adds
+two checks: a scan that fails the build if source code branches on the
+operating system or hard-codes an absolute path, and headless smoke runs of
+the real application loop (launch, setup, three turns, finish a game, new
+game, exit).
+
+CI uses SDL's dummy video driver, so it does not prove a window opens on a
+real desktop. For each release candidate, a person repeats the smoke steps
+by hand on each OS with a real display: launch with
+`python -m snakes_ladders.main`, set up two players, take three turns,
+finish a game, start a new game, and exit. The save, exit and resume steps
+of TC-N05-1 are added once FR-15 exists.
+
+
 ## Four-player scalability (NFR-07)
 
 The same performance check runs separately with two and four players, with
