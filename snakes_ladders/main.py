@@ -17,8 +17,17 @@ def main():
         pygame.display.set_caption("Snakes and Ladders")
         pygame.key.start_text_input()
         controller = GameController()
+
+        def make_setup():
+            return SetupScreen(
+                on_start=controller.start_new_game,
+                on_resume=controller.on_resume_requested,
+                can_resume=controller.can_resume,
+                controller=controller,
+            )
+
         screens = {
-            "setup": SetupScreen(controller.start_new_game),
+            "setup": make_setup(),
             "game": GameScreen(controller),
             "result": ResultScreen(controller),
         }
@@ -37,7 +46,7 @@ def main():
                     previous_screen = controller.screen
                     screens[controller.screen].handle_event(event)
                     if previous_screen != "setup" and controller.screen == "setup":
-                        screens["setup"] = SetupScreen(controller.start_new_game)
+                        screens["setup"] = make_setup()
             screens[controller.screen].draw(canvas)
             present(canvas, surface)
             pygame.display.flip()
